@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=CID
+Comment=Insert and manage the system in AD
+Icon=/usr/share/cid/icons/cid.png
+Exec=/usr/sbin/cid-gtk
+Terminal=false
+Categories=System;
+Keywords=cid;cid-gtk;ad;active directory;join;domain;remove;leave;logon;

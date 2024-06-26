@@ -1,0 +1,144 @@
+.\" Description:		CID-GTK MAN-PAGE
+.\" Copyright (C) 2012-2023 Eduardo Moraes <emoraes25@gmail.com>
+.\" This file is part of CID (Closed In Directory).
+.\"
+.\" CID is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" CID is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with CID.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+
+
+.TH CID-GTK 8 2023-06-11 "CID version 1.2.5" "System Administration"
+
+
+.SH NAME
+cid-gtk \- graphical tool to insert and manage Linux stations in a AD domain.
+
+
+.SH SYNOPSIS
+\fBcid-gtk\fP [-h|--help] [-v|--version]
+
+
+.SH DESCRIPTION
+This tool is part of the CID (Closed In Directory) project,
+which is a set of bash scripts to automate and optimize the
+configuration of a Linux computer in an Active Directory domain
+through the \fBsamba\fP(7) suite.
+
+.PP
+The \fBcid-gtk\fP tool provides a simple graphical interface that allows you
+to manage a Linux system as a workstation within an Active Directory domain.
+Options such as join/remove the station from domain, insert/remove domain
+users into system local groups, block the logon at the station to a domain
+specific user or group, and manage file and printer shares are examples of
+the type of management that this program proposes.
+The \fBcid(8)\fP utility provides some of these functionality on command line.
+
+
+.SH OPTIONS
+These programs follow the usual GNU command line syntax, with long
+options starting with two dashes (-).
+A summary of options is included below.
+
+.TP
+.B \-h, \-\-help
+Show summary of options.
+
+.TP
+.B \-v, \-\-version
+Show version of program.
+
+
+.SH ENVIRONMENT
+.SS HOSTNAME
+Before actually performing the \fBJoin the domain\fP option, the program
+uses the value of this variable, or the result of the "hostname" command,
+to verify that the station name meets the maximum limit of 15 characters
+of the NetBIOS API, returning a warning and aborting the operation if it
+is not in compliance.
+
+.SS PAM_USER
+The value of this variable is used by a CID script executed at each
+logon of a domain user to verify if this user that it belongs to
+domain admins group, and based on this, adds or removes that user
+from the system local groups.
+
+.SS EXPORTED VARIABLES FOR LOGON SCRIPTS
+
+.TP
+\fBNETLOGON\fP
+.bp
+Mount point of the Netlogon share on the system.
+
+.TP
+\fBUSERNAME\fP
+.bp
+Name of the user that are opening session.
+
+.TP
+\fBUSERID\fP
+.bp
+ID of the user that are opening session.
+
+.TP
+\fBUSERDOMAIN\fP
+.bp
+Domain name of the user that is opening session.
+
+.TP
+\fBUSERPROFILE\fP
+.bp
+Home directory path of the user that is opening session.
+
+.TP
+\fBUSERSHELL\fP
+.bp
+Login shell of the user that is opening session.
+
+.TP
+\fBGROUPID\fP
+.bp
+Primary group ID of the user that is opening session.
+
+.TP
+\fBUSERGROUP\fP
+.bp
+Primary group name of the user that is opening session.
+
+.TP
+\fBUSERGROUPS\fP
+.bp
+Group list separated by commas (,) of the user that is opening session.
+
+
+.SH FILES
+.TP
+/etc/cid/cid.conf
+This file contains parameters that specify the paths of all files and
+directories that the CID modifies or queries to provide functionality
+similar to that of a Windows workstation to the Linux system in an
+Active Directory domain.
+The default values for these parameters are filled with the most common
+file and directory paths used in most Linux distributions and by the
+packages of programs used by CID, such as the \fBsamba\fP(7) and others.
+Rarely adjustments will be required in this file.
+
+
+.SH AUTHOR
+Eduardo Moraes, <\fIemoraes25@gmail.com\fP>.
+
+.P
+Please send your bug reports, suggested features and comments to the above address.
+
+
+.SH SEE ALSO
+\fBcid-change-pass-gtk\fP(1), \fBsamba\fP(7), \fBcid\fP(8), \fBpam_mount\fP(8), \fBwinbindd\fP(8)

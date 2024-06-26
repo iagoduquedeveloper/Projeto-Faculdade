@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=CID Change Pass
+Comment=Change AD user password
+Icon=/usr/share/cid/icons/cid-cp.png
+Exec=/usr/bin/cid-change-pass-gtk
+Terminal=false
+Categories=System;
+Keywords=cid;closed in directory;change;password;user;domain;cid-change-pass-gtk

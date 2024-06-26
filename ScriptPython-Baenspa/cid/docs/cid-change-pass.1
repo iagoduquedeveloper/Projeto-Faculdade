@@ -1,0 +1,70 @@
+.\" Description:	CID-CHANGE-PASS MAN-PAGE
+.\" Copyright (C) 2012-2023 Eduardo Moraes <emoraes25@gmail.com>
+.\" This file is part of CID (Closed In Directory).
+.\"
+.\" CID is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" CID is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with CID.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+
+
+.TH CID-CHANGE-PASS 1 2023-06-11 "CID version 1.2.5" "User commands"
+
+
+.SH NAME
+cid-change-pass \- command-line utility to help domain users change their passwords.
+
+
+.SH SYNOPSIS
+\fBcid-change-pass\fP [username...] [-h|--help] [-v|--version]
+
+
+.SH DESCRIPTION
+This tool is part of the CID (Closed In Directory) project,
+which is a set of bash scripts to automate and optimize the
+configuration of a Linux computer in an Active Directory domain
+through the \fBsamba\fP(7) suite.
+
+.PP
+\fBcid-change-pass\fP is a utility to help a domain user change their
+password. The user must enter his current password and then the new
+password he wants (this may have restrictions according to domain
+security policies).
+If run as superuser the program must receive one or more
+user accounts from the domain as argument.
+The \fBcid-change-pass-gtk\fP(1) utility provides the same
+functionality in graphical mode.
+
+
+.SH OPTIONS
+These programs follow the usual GNU command line syntax, with long
+options starting with two dashes (-).
+A summary of options is included below.
+
+.TP
+.B \-h, \-\-help
+Show summary of options.
+
+.TP
+.B \-v, \-\-version
+Show version of program.
+
+
+.SH AUTHOR
+Eduardo Moraes, <\fIemoraes25@gmail.com\fP>.
+
+.P
+Please send your bug reports, suggested features and comments to the above address.
+
+
+.SH SEE ALSO
+\fBcid-change-pass-gtk\fP(1), \fBcid\fP(8)

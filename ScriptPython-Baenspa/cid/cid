@@ -1,0 +1,39 @@
+#
+# Description: Bash completion for 'cid' command
+#
+# Copyright (C) 2012-2023 Eduardo Moraes <emoraes25@gmail.com>
+# This file is part of CID (Closed In Directory).
+#
+# CID is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# CID is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with CID.  If not, see <http://www.gnu.org/licenses/>.
+#------------------------------------------------------------------------#
+
+
+_cid () {
+	COMPREPLY=()
+
+    case $COMP_CWORD in
+        1)
+			COMPREPLY=( $(compgen -W 'join leave block unlock account share status' -- "${COMP_WORDS[COMP_CWORD]}" ) )
+		;;
+        2)
+			if [ "${COMP_WORDS[1]}" = "account" ] || [ "${COMP_WORDS[1]}" = "share" ]; then
+				COMPREPLY=( $(compgen -W 'add del list' -- "${COMP_WORDS[COMP_CWORD]}" ) )
+			fi
+		;;
+    esac
+
+    return 0
+}
+
+complete -o default -F _cid cid

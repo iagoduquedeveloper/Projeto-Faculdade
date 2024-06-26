@@ -1,0 +1,724 @@
+.\" Description:		CID MAN-PAGE
+.\" Copyright (C) 2012-2023 Eduardo Moraes <emoraes25@gmail.com>
+.\" This file is part of CID (Closed In Directory).
+.\"
+.\" CID is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" CID is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with CID.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+
+
+.TH CID 8 2023-06-11 "CID version 1.2.5" "System Administration"
+
+
+.SH NAME
+cid \- command-line utility to insert and manage Linux computers in the AD domain.
+
+
+.SH SYNOPSIS
+\fBcid\fP {join|leave|block|unlock|account|share|status} [-h|--help] [-v|--version]
+
+
+.SH DESCRIPTION
+This tool is part of the CID (Closed In Directory) project,
+which is a set of bash scripts to automate and optimize the
+configuration of a Linux computer in an Active Directory domain
+through the \fBsamba\fP(7) suite.
+
+.PP
+The \fBcid\fP is a command-line utility that receives arguments and runs the
+main functions of the \fBcid-gtk\fP(8) graphical tool in an automated manner.
+The first argument must be the command you want to execute and then its
+respective arguments (if necessary).
+Help and version options are also supported.
+
+
+.SH OPTIONS
+These programs follow the usual GNU command line syntax, with long
+options starting with two dashes (-).
+A summary of options is included below.
+
+.TP
+.B \-h, \-\-help
+Show summary of options.
+
+.TP
+.B \-v, \-\-version
+Show version of program.
+
+
+.SH COMMANDS
+.SS join
+This command receives arguments to join the station in a domain.
+The configuration can be customized through the "options" that are
+available for this task. If an option is not used,
+an opposing setting is adopted by default.
+This command can also be performed after entering the station in a
+domain to change the settings according to the options.
+In this case, a previously used option must be repeated on the command line
+if you want to keep the settings related to it, otherwise these settings
+will be undone and the default setting regarding the option will be applied.
+This also means that running the command without options and arguments
+when the station is in a domain causes all default settings to be applied.
+
+.TP
+.B Credentials arguments
+
+.TP
+domain=<fqdn>
+Fully Qualified Domain Name.
+
+.TP
+user=<admin account>
+A domain admin account.
+
+.TP
+pass=<password>
+User password.
+
+.TP
+host=<hostname> (optional)
+Name for computer account that will be created in AD. If not specified,
+the account will be created with the same hostname defined in the system.
+
+.TP
+ou=<container> (optional)
+You can optionally specify the Organizational Unit in which the computer
+account will be created upon joining the domain, e.g., "Computers/Linux".
+
+.TP
+credentials=<filename> (optional)
+You can optionally enter a file that contains credentials arguments.
+This is especially true if you do not want to insert "password" argument
+on command line to prevent it from being written to your shell history.
+It is not necessary for the file to contain all the arguments, but the
+mandatory arguments that are not contained in the file must be entered
+on the command line. The file should have the following format:
+
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+		domain=<fqdn>
+		user=<admin account>
+		pass=<password>
+		ou=<container>
+		host=<hostname>
+.fi
+.RE
+
+.TP
+config_file={<filename>|false} (optional)
+Optionally, you can enter a file containing Samba configuration 
+parameters to be attached to the settings that the CID makes in
+the Global section of \fBsmb.conf\fP(5). The CID will filter the
+contents of the file so that no parameters conflict with the
+default parameters set by the CID. Use the \fBfalse\fP keyword to
+remove the contents of a file previously defined by this argument.
+This for the CID works as a behavior option!
+
+.TP
+.B Behavior options
+
+.TP
+\-\-preserve|-p
+Preserve the behavior options defined earlier when join is used to
+change these options after the system has been entered into the domain.
+
+.TP
+\-\-[no-]netbios
+Enable or disable NetBIOS over TCP/IP.
+
+.TP
+\-\-[no-]kerberos
+Enable or disable authentication via Kerberos.
+
+.TP
+\-\-[no-]ccache
+Enable or disable credential caching.
+
+.TP
+\-\-[no-]logonscripts
+Enable or disable logon scripts.
+
+.TP
+\-\-[no-]defaultdomain
+Use or does not the domain as default.
+
+.TP
+\-\-[no-]auth-sudo
+Enable or disable authentication for the "sudo" command.
+
+.TP
+\-\-[no-]share-printers
+Shares or not all printers on CUPS via Samba (SMB protocol).
+
+.TP
+\-\-[no-]use-keytab
+Use or not keytab for kerberos validation in Samba.
+
+.TP
+\-\-[no-]rfc2307
+Use or not winbind "idmap_ad" backend. If enabled,
+requires the arguments:
+
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+		min_id=<NUM> \- Initial ID of the range for the backend "idmap_ad".
+		max_id=<NUM> \- Final ID of the range for backend "idmap_ad".
+		nssinfo={rfc2307|template} \- Home and Shell Information Base (default: template).
+.fi
+
+.SS leave
+This command undoes the station's join settings to the domain.
+Optionally, you can use the credentials arguments with a domain
+administrator account so that the program sends a command to
+the DC to remove the computer account from the domain. If this
+command fails, the station reconfiguration will not be interrupted.
+
+.TP
+.B Credentials arguments
+
+.TP
+user=<admin account>
+A domain admin account.
+
+.TP
+pass=<password>
+User password.
+
+.TP
+credentials=<filename> (optional)
+You can optionally enter a file that contains credentials arguments
+(see "credentials" above in "Credentials arguments" of the "join" command).
+
+.SS block
+Restricts the login in the station to a domain specific user or group.
+You can enter only one user or group account. Use "@groupname" to enter
+a group account. If the groupname contains spaces, enter it in single
+quotation marks (') or in double quotation marks (").
+If a lock has already been set, it will be overwritten.
+This requires that the station already belong to a domain.
+
+.SS unlock
+Remove login lock restriction (if any).
+
+.SS account
+This command manages domain accounts in system local groups.
+The first argument should be one of the subcommands listed below.
+This requires that the station already belong to a domain.
+
+.TP
+.B Subcommands
+
+.TP
+\fBadd\fP
+.bp
+This receives one or more user and/or group accounts from the domain
+as the argument and adds to the local groups in the system that have
+administrative privileges. Use "@groupname" to enter a group account.
+If the groupname contains spaces, enter it in single quotation marks (')
+or in double quotation marks ("). When group accounts are added in
+this way your members will be added gradually to the local groups as
+they logon this computer and as they will be removed in a next logon
+not offline if they no longer belong to that domain group. Using an
+asterisk (*) at the end of the groupname you will force the addition
+of all your members at that time, however these users will only be
+removed if you run the "del" subcommand and inform the usernames
+individually, or the groupname by once again using the asterisk at
+the end to remove all your members at in time.
+
+.TP
+\fBdel\fP
+.bp
+This receives one or more user and/or group accounts from the AD
+as the argument and removes this accounts from the system local groups.
+These accounts must have been added to these groups by the "add" subcommand
+described above, or by the CID script that automatically adds domain admins
+to these groups during logon to this computer.
+
+.TP
+\fBlist\fP
+.bp
+Lists domain accounts added to system local groups by CID. If an account
+name is entered, it displays information for that account only.
+
+.SS share
+This command manages file and printers shares of the local system.
+The first argument should be one of the subcommands listed below.
+This requires that the station already belong to a domain.
+
+.TP
+.B Subcommands
+
+.TP
+\fBadd\fP
+.bp
+Adds or updates a file or printer share to the local Samba server. To do this,
+you will need to provide the following arguments and options that vary depending
+on the sharing mode you use. The available sharing modes are:
+.sp
+	\fBcommon:\fP File sharing mode used by default if the "mode" argument is
+omitted. This mode allows sharing access rules to be managed locally through
+the "rule" argument, or through Windows ACLs, which can be managed using a
+utility such as the Microsoft Management Console (MMC).
+.sp
+	\fBuserfolder:\fP This mode enables the "homes" section of Samba, which
+is a special type of file sharing that automatically provides a share with
+the same name as the user who accesses it. In this mode, the "path" argument
+must contain the path of the parent directory where the folders for each user
+share are to be created. If this argument is omitted, the "/home" directory
+will be assumed by default. If disk quota is used, it will be automatically
+applied to each user directory.
+.sp
+	\fBprinter:\fP Mode used to share a printer configured on the local CUPS server
+through Samba (via SMB protocol). This is optional or unnecessary
+when the "--share-printers" behavior option was used. In this mode the
+"path" argument should be given the name of a printer as configured in CUPS
+instead of a directory path. When omitted this argument will receive the
+value used in the "name" argument or vice versa.
+
+.IP
+.B Arguments
+
+.IP
+mode={common|userfolder|printer}
+.bp
+    Share mode (default: common).
+
+.IP
+name=<sharename>
+.bp
+    Share name.
+
+.IP
+template=<sharename>
+.bp
+    Template share.
+When using template in a file share only the last directory level
+needs to be specified in path argument if you want it to be created
+in the same parent directory as the copied share.
+
+.IP
+path=<folder|printer>
+.bp
+    Directory path or printer name in CUPS.
+
+.IP
+comment=<description>
+.bp
+    Share description (optional).
+
+.IP
+quota=<value>[{k|m|g|t|p|e|z|y}]
+.bp
+    Disk quota size. If the unit is omitted, k (Kilobytes) is assumed by default.
+Use 0 value to remove a previously defined value.
+
+.IP
+tolerance=<value>[{k|m|g|t|p|e|z|y}]
+.bp
+    Tolerance quota size. If the unit is omitted, k (Kilobytes) is assumed by default.
+Use 0 value to remove a previously defined value.
+
+.IP
+config_file={<filename>|false}
+.bp
+    Additional config file.
+Optionally, you can enter a file containing Samba configuration 
+parameters to be attached to the settings that the CID makes in
+the share section of \fBsmb.conf\fP(5). The CID will filter the
+contents of the file so that no parameters conflict with the
+default parameters set by the CID. Use the \fBfalse\fP keyword to
+remove the contents of a file previously defined by this argument.
+This for the CID works as a share option!
+
+.IP
+rule=[{+|-}]{u|g}:account:{r|f|d}
+.bp
+    Access rule to sharing (default: u:everyone:r).
+
+.IP
+Rules are made up of 3 fields separated by a colon (:),
+and have the format "[Type]:<Account>:[Permission]", where:
+
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+		\- Type is 'u' for user or 'g' for group;
+		\- Account is a domain user or group account;
+		\- Permission is 'r' for read-only, 'f' for full access or 'd' for denied;
+.fi
+.RE
+
+.IP
+Use a addition sign (+) at the beginning of the rule to
+add it without replacing pre-existing ACLs.
+Use a subtraction sign (-) and the "Type:Account" syntax
+to remove the ACLs for this account.
+Use a semicolon (;) to separate more than one rule.
+The "everyone" term can also be used in "Account" to represent all users.
+
+.IP
+.B Options
+
+.IP
+\-\-[no-]hidden
+.bp
+    Hides or not the share of the list of available shares in a net view and browse list.
+
+.IP
+\-\-[no-]allow-guest
+.bp
+	Allows or disallow the share to be accessed without authentication (no password) by any user.
+
+.IP
+\-\-[no-]subdir-quota
+.bp
+	Apply or not apply quota to the first level of subdirectories.
+
+.TP
+\fBdel\fP
+.bp
+This receive one or more share names as argument, and removes them.
+
+.TP
+\fBlist\fP
+.bp
+Lists the shares added in the station. If a share name is entered,
+it displays information for that share only.
+
+.SS status
+Displays relevant information about station join to the domain.
+
+
+.SH ENVIRONMENT
+.SS HOSTNAME
+Before actually performing the \fBJoin the domain\fP option, the program
+uses the value of this variable, or the result of the "hostname" command,
+to verify that the station name meets the maximum limit of 15 characters
+of the NetBIOS API, returning a warning and aborting the operation if it
+is not in compliance.
+
+.SS PAM_USER
+The value of this variable is used by a CID script executed at each
+logon of a domain user to verify if this user that it belongs to
+domain admins group, and based on this, adds or removes that user
+from the system local groups.
+
+.SS EXPORTED VARIABLES FOR LOGON SCRIPTS
+
+.TP
+\fBNETLOGON\fP
+.bp
+Mount point of the Netlogon share on the system.
+
+.TP
+\fBUSERNAME\fP
+.bp
+Name of the user that are opening session.
+
+.TP
+\fBUSERID\fP
+.bp
+ID of the user that are opening session.
+
+.TP
+\fBUSERDOMAIN\fP
+.bp
+Domain name of the user that is opening session.
+
+.TP
+\fBUSERPROFILE\fP
+.bp
+Home directory path of the user that is opening session.
+
+.TP
+\fBUSERSHELL\fP
+.bp
+Login shell of the user that is opening session.
+
+.TP
+\fBGROUPID\fP
+.bp
+Primary group ID of the user that is opening session.
+
+.TP
+\fBUSERGROUP\fP
+.bp
+Primary group name of the user that is opening session.
+
+.TP
+\fBUSERGROUPS\fP
+.bp
+Group list separated by commas (,) of the user that is opening session.
+
+
+.SH FILES
+.TP
+/etc/cid/cid.conf
+This file contains parameters that specify the paths of all files and
+directories that the CID modifies or queries to provide functionality
+similar to that of a Windows workstation to the Linux system in an
+Active Directory domain.
+The default values for these parameters are filled with the most common
+file and directory paths used in most Linux distributions and by the
+packages of programs used by CID, such as the \fBsamba\fP(7) and others.
+Rarely adjustments will be required in this file.
+
+
+.SH EXAMPLES
+
+.LP
+Joining station in the domain with the default options:
+.RS
+.nf
+\fBcid join domain=example.com user=administrator pass=p@$$w0rd\fP
+.fi
+.RE
+
+.LP
+Joining station in domain using credentials
+file and disabling logon scripts:
+.RS
+.nf
+\fBcid join credentials=/tmp/domainadmin-creds.txt --no-logonscripts\fP
+.fi
+.RE
+
+.LP
+Joining station in the domain by specifying
+the OU and using the idmap_ad backend:
+.RS
+.nf
+\fBcid join domain=example.com user=administrator pass=p@$$w0rd ou=Computers/Linux --rfc2307 min_id=10000 max_id=1999999 nssinfo=rfc2307\fP
+.fi
+.RE
+
+.LP
+Disabling the NetBIOS API and Kerberos authentication, and adopting the default
+configuration for the other options with the station already in the domain:
+.RS
+.nf
+\fBcid join --no-netbios --no-kerberos\fP
+.fi
+.RE
+
+.LP
+Disabling the Logon Scripts and enabling Kerberos authentication
+preserving the other behavior options previously defined:
+.RS
+.nf
+\fBcid join -p --no-logonscripts --kerberos\fP
+.fi
+.RE
+
+.LP
+Undoing station's join settings to the domain:
+.RS
+.nf
+\fBcid leave\fP
+.fi
+.RE
+
+.LP
+Removing the station of the domain using
+credentials arguments in command line:
+.RS
+.nf
+\fBcid leave user=administrator pass=p@$$w0rd\fP
+.fi
+.RE
+
+.LP
+Removing the station of the domain using a credentials file:
+.RS
+.nf
+\fBcid leave credentials=/tmp/domainadmin-creds.txt\fP
+.fi
+.RE
+
+.LP
+Restricting the login to \fIjohn\fP user:
+.RS
+.nf
+\fBcid block john\fP
+.fi
+.RE
+
+.LP
+Restricting the login to \fIitd\fP group:
+.RS
+.nf
+\fBcid block @itd\fP
+.fi
+.RE
+
+.LP
+Removing logon lock:
+.RS
+.nf
+\fBcid unlock\fP
+.fi
+.RE
+
+.LP
+Adding \fIjohn\fP and \fImary\fP users to the system local groups:
+.RS
+.nf
+\fBcid account add john mary\fP
+.fi
+.RE
+
+.LP
+Adding all members of \fIdomain admins\fP group to the system local groups:
+.RS
+.nf
+\fBcid account add '@domain admins*'\fP
+.fi
+.RE
+
+.LP
+Removing the \fIjohn\fP user and \fIexternal operators\fP group from system local groups:
+.RS
+.nf
+\fBcid account del john '@external operators'\fP
+.fi
+.RE
+
+.LP
+Listing the domain accounts added to the system local groups:
+.RS
+.nf
+\fBcid account list\fP
+.fi
+.RE
+
+.LP
+Adding the \fIstandards$\fP file share in \fIcommon\fP mode:
+.RS
+.nf
+\fBcid share add name=standards$ path=/srv/shares/standards\fP
+.fi
+.RE
+
+.LP
+Adding the \fIitd$\fP file share in \fIcommon\fP mode with full access permission
+for \fIITD\fP group with \fI2GB\fP disk quota and \fI500MB\fP tolerance quota:
+.RS
+.nf
+\fBcid share add name=itd$ path=/srv/shares/groups/itd quota=2g tolerance=500m rule="g:itd:f"\fP
+.fi
+.RE
+
+.LP
+Adding the \fImkt$\fP file share in \fIcommon\fP mode with full access permission
+for \fIMKT\fP group copying the same parameters from the \fIitd\fP share and using the
+same parent directory:
+.RS
+.nf
+\fBcid share add name=mkt$ template=itd$ path=mkt rule="g:mkt:f"\fP
+.fi
+.RE
+
+.LP
+Adding the \fIpublic\fP file share in \fIcommon\fP mode with full access permission
+for \fIeveryone\fP and without authentication:
+.RS
+.nf
+\fBcid share add name=public path=/srv/shares/public comment="Public Share in $HOSTNAME" rule="u:everyone:f" --allow-guest\fP
+.fi
+.RE
+
+.LP
+Adding read-only permission for the \fItrainee\fP user on \fIpublic\fP file share:
+.RS
+.nf
+\fBcid share add name=public rule=+"u:trainee:r"\fP
+.fi
+.RE
+
+.LP
+Removing permission for the \fItrainee\fP user on \fIpublic\fP file share:
+.RS
+.nf
+\fBcid share add name=public rule=-"u:trainee"\fP
+.fi
+.RE
+
+.LP
+Adding the \fIsoftwares\fP hidden file share in \fIcommon\fP mode with full
+access permission for the \fIboss\fP user and the \fIDomain admins\fP
+group and read-only permission for the \fIDomain users\fP group from
+default domain and of \fISAMPLE\fP subdomain:
+.RS
+.nf
+\fBcid share add name=softwares path=/srv/shares/softwares rule="u:boss:f;g:Domain admins:f;g:Domain users:r;g:SAMPLE\eDomain users:r" --hidden\fP
+.fi
+.RE
+
+.LP
+Adding the \fIhomes\fP share:
+.RS
+.nf
+\fBcid share add mode=userfolder path=/srv/shares/home\fP
+.fi
+.RE
+
+.LP
+Sharing the printer \fIPRINTER-01\fP:
+.RS
+.nf
+\fBcid share add mode=printer name=PRINTER-01\fP
+.fi
+.RE
+
+.LP
+Removing the \fIstandards$\fP and \fIpublic\fP shares:
+.RS
+.nf
+\fBcid share del standards$ public
+.fi
+.RE
+
+.LP
+Listing the shares added in the station:
+.RS
+.nf
+\fBcid share list\fP
+.fi
+.RE
+
+.LP
+Displaying information about the joined of station to domain:
+.RS
+.nf
+\fBcid status\fP
+.fi
+.RE
+
+
+.SH AUTHOR
+Eduardo Moraes, <\fIemoraes25@gmail.com\fP>.
+
+.P
+Please send your bug reports, suggested features and comments to the above address.
+
+
+.SH SEE ALSO
+\fBcid-change-pass\fP(1), \fBsmb.conf\fP(5), \fBsamba\fP(7), \fBcid-gtk\fP(8), \fBpam_mount\fP(8), \fBwinbindd\fP(8)
